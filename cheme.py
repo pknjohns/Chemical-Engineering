@@ -78,9 +78,34 @@ def Bern_t1(Vdot, P_t, D_guess, rho, mu, L, z):
 # THERMO EQUATIONS OF STATE (EOS)
 # -----------------------------------------------------------
 
+def T_red(T, Tc):
+    """
+    Function to calculate the reduced temp of a mtrl
+    T = temp of mtrl
+    Tc = critical temp of mtrl
+    """
+    return T/Tc
+
+def P_red(P, Pc):
+    """
+    Function to calculate the reduced pressure of a mtrl
+    P = pressure of mtrl
+    Pc = critical pressure of mtrl
+    """
+    return P/Pc
+
+def compress_factor(P, V, T):
+    """
+    Function to calculate compressibility factor for non-ideal gases
+    V is molar volume of the gas
+    P is gas pressure
+    T is gas temperature
+    """
+    return P*V/R/T
+
 def acentric(Pr):
     """
-    Function to calculate acentric factor for a material
+    Function to calculate acentric factor (omega) for a material
     at Tr = 0.7
     """
     return -1.0 - np.log10(Pr)
@@ -89,8 +114,42 @@ def pitzer(Pr, Tr, omega):
     """
     Pitzer Correlation, truncated, virial EOS
     Function used to find compressibility factor Z
+
+    Pr is the reduced pressure
+    Tr is the reduced temperature
+    omega is the acentric factor
+    b0 and b1 are the virial coefficients, which are both
+    functions of temp
+    simple to solve & reasonably accurate
     """
     b0 = 0.083 - 0.422/(Tr**1.6)
     b1 = 0.139 - 0.172/(Tr**4.2)
     return 1 + b0*Pr/Tr + omega*b1*Pr/Tr
 
+"""
+General Cubic EOS form:
+
+Z = 1 + Beta - q*Beta*((Z-Beta)/((Z + eps*Beta)*(Z + sigma*Beta)))
+
+Beta = Omega*Pr/Tr
+
+q = (Phi*alpha(Tr))/(Omega*Tr)
+
+Omega, Phi, eps, sigma are constants defined depending on EOS used
+alpha(Tr) means alpha is a function of Tr and the acentric factor (omega)
+
+Use to solve for molar volume (Vm)
+    largest Vm = gas
+    smallest Vm = liquid
+    middle Vm = no pertinent meaning
+"""
+
+def vdw(V, Tc, Pc, T, P):
+    """
+    Van der Waals EOS
+    Used to describe non-ideal behavior of gasses
+    """
+    a = (27/64)*(R**2)*(Tc**2)/Pc
+    b = (1/8)*(R*Tc/Pc)
+
+    return (R*T)/(V-b) - a/(V**2) - P
