@@ -144,12 +144,51 @@ Use to solve for molar volume (Vm)
     middle Vm = no pertinent meaning
 """
 
+def cubEOS(Z, alpha, sig, eps, Ome, Phi, Tr, Pr):
+    Beta = Ome*Pr/Tr
+    q = Phi*alpha/Ome/Tr
+    return 1 + Beta - q*Beta*((Z-Beta)/((Z + eps*Beta)*(Z + sig*Beta))) - Z
+
 def vdw(V, Tc, Pc, T, P):
     """
     Van der Waals EOS
     Used to describe non-ideal behavior of gasses
+    Can use to find molar volume with fsolve
+    Tc = critical temp of mtrl
+    Pc = critical pressure of mtrl
+    V = guess for molar volume
+    T = temp of mtrl
+    P = pressure of mtrl
     """
     a = (27/64)*(R**2)*(Tc**2)/Pc
     b = (1/8)*(R*Tc/Pc)
 
     return (R*T)/(V-b) - a/(V**2) - P
+
+def rk(Z, Tr, Pr):
+    """
+    Redlich Kwong cubic EOS
+    Used to describe non-ideal behavior of gasses
+    Can use to find molar volume with fsolve
+    """
+    alpha = Tr**-0.5
+    return cubEOS(Z, alpha, 1, 0, 0.08664, 0.42748, Tr, Pr)
+
+def srk(Z, Tr, Pr, ome):
+    """
+    Soave Redlich Kwong cubic EOS
+    Used to describe non-ideal behavior of gasses
+    Can use to find molar volume with fsolve
+    Very accurate for broad range of conditions
+    """
+    alpha = (1 + (0.480 + 1.574*ome - 0.176*ome**2)*(1-Tr**0.5))**2
+    return cubEOS(Z, alpha, 1, 0, 0.08664, 0.42748, Tr, Pr)
+
+def pr(Z, Tr, Pr, ome):
+    """
+    Perg Robinson cubic EOS
+    Used to describe non-ideal behavior of gasses
+    Can use to find molar volume with fsolve
+    Very accurate for broad range of conditions (favored among EOS)
+    """
+    alpha = (1 + (0.))
