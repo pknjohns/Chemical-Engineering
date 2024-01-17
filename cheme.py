@@ -172,7 +172,11 @@ def rk(Z, Tr, Pr):
     Can use to find molar volume with fsolve
     """
     alpha = Tr**-0.5
-    return cubEOS(Z, alpha, 1, 0, 0.08664, 0.42748, Tr, Pr)
+    sig = 1
+    eps = 0
+    Ome = 0.08664
+    Phi = 0.42748
+    return cubEOS(Z, alpha, sig, eps, Ome, Phi, Tr, Pr)
 
 def srk(Z, Tr, Pr, ome):
     """
@@ -182,7 +186,11 @@ def srk(Z, Tr, Pr, ome):
     Very accurate for broad range of conditions
     """
     alpha = (1 + (0.480 + 1.574*ome - 0.176*ome**2)*(1-Tr**0.5))**2
-    return cubEOS(Z, alpha, 1, 0, 0.08664, 0.42748, Tr, Pr)
+    sig = 1
+    eps = 0
+    Ome = 0.08664
+    Phi = 0.42748
+    return cubEOS(Z, alpha, sig, eps, Ome, Phi, Tr, Pr)
 
 def pr(Z, Tr, Pr, ome):
     """
@@ -191,4 +199,9 @@ def pr(Z, Tr, Pr, ome):
     Can use to find molar volume with fsolve
     Very accurate for broad range of conditions (favored among EOS)
     """
-    alpha = (1 + (0.))
+    alpha = (1 + (0.37464 + 1.54226*ome - 0.26992*ome**2)*(1 - Tr**0.5))**2
+    sig = 1 + np.sqrt(2)
+    eps = 1 - np.sqrt(2)
+    Ome = 0.07780
+    Phi = 0.45724
+    return cubEOS(Z, alpha, sig, eps, Ome, Phi, Tr, Pr)
