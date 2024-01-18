@@ -13,7 +13,7 @@ from IPython.display     import Image
 sp.init_printing()       # for pretty output for symbolic math
 try:
     from IPython import get_ipython
-    get_ipython().magic('matplotlib inline')
+    get_ipython().run_line_magic('matplotlib', 'inline')
 except (ImportError, NameError):
     pass  # If not in a Jupyter environment, ignore the magic command
 
